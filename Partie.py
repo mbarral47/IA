@@ -56,11 +56,11 @@ class jeu :
     
     def deroulement(self):
         while(True):
-            self.lab.tour(self, self.lab.joueurA)
+            self.tour(self.lab.joueurA)
             if self.lab.joueurA==self.lab.tresor :
                 print("VICTOIRE JOUEUR A")
                 break
-            self.lab.tour(self, self.lab.joueurB)
+            self.tour(self.lab.joueurB)
             if self.lab.joueurB==self.lab.tresor:
                 print("VICTOIRE JOUEUR B")
                 break
