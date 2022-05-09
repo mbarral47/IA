@@ -12,6 +12,38 @@ from termcolor import colored, cprint
 path = "/home/barral/Documents/IA/ProjetLabyrinthe"
 sys.path.append(path)
 
+def choixlignes(nbdir):
+    possibles = [1,2,3,4,5,6,7,8]
+    k=0
+    n=len(possibles)
+    while n>nbdir:
+        a=possibles[k]
+        b=0
+        b=random.randint(0,1)
+        if b==1:
+            possibles.remove(a)
+            k=0
+            
+        n=len(possibles)
+        k=(k+1)%n
+    return possibles
+
+def choixcol(t):
+    for i in range(len(t)):
+        j=random.randint(1,8)
+        a=t[i]
+        t[i]=[a,j]
+    print(t)    
+    i=1
+    b=False
+    while not b:
+        b=True
+        while i < len(t)-1:
+            if t[i][1]==t[i+1][1]:
+                b=False
+                t[i]=random.randint(1,8)
+    return t
+
 
 class Labyrinthe:
     def __init__(self):
