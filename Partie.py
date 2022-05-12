@@ -22,7 +22,7 @@ class jeu :
         print("direction(s) possible(s) pour votre joueur: \n", p)
         t = input("suite à la réponse souhaitez-vous faire une translation (true/false): ")
         if (t=="true"):
-            o = input("true : ligne - false : colonne: ")
+            o = input("ligne - colonne")
             c = input("par la gauche ou droite ou haut ou bas : ")
             n = int(input("et un numéro de ligne ou colonne: "))
             self.lab.une_translation(o, c, n)
