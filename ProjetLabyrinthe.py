@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 21 09:26:11 2022
+
+@author: user
+"""
 """ 
 A faire : methode sur Labyrinthe qui prend la case motrice, 
 effecture les changements et retrourne une nouvelle case motrice
@@ -7,6 +12,9 @@ effecture les changements et retrourne une nouvelle case motrice
 représentation graphique du jeu (symbolique)
 representation 1 : une un caractère sur une ligne pour une case
 2 : plusieurs lignes pour une case
+
+
+
 
 """
 
@@ -109,43 +117,44 @@ class CaseGen :
         return A
         
         
-    
-        
 
-            
-
-        
-        
-        
 class ImmobileCase (CaseGen):
-    def __init__(self,i,j,tab_contraintes):
+    def __init__(self,i,j,tab_contraintes,dir):
         
         super(ImmobileCase,self).__init__(i,j)
         possibles = []
-        
-        for i in range(4) :
-            if tab_contraintes[i]==0  :
+        p = random.randint(1,3)
+
+        for i in range(dir) :
+            if tab_contraintes[i]== 0  :
                 possibles.append(i)
         
-        nb_direct= min(random.randint(2,3),len(possibles))
+        nb_direct= min(len(possibles),dir)
 
         #while(nb_direct>0) :
         sommet = random.sample(possibles,nb_direct)
-        for i in sommet:
-            self.directions[i]=True 
+        n = len(sommet)
+        for i in range(n):
+    
+            a=sommet[(i+p)%n]
+            print(a)
+            if i < nb_direct : 
+                self.directions[a]=True 
             #nb_direct = nb_direct-1
             
         self.mobile = False
 
+"""
 
+"""
 
 class MobileCase (CaseGen):
     
-    def __init__(self,i,j):
+    def __init__(self,i,j,nbdir):
         super(MobileCase,self).__init__(i,j)
         
         
-        nb_direct = random.randint(2,3)
+        nb_direct = nbdir
         deja_tire = []
         while(nb_direct>0) :
             sommet = random.randint(0,3)
@@ -153,8 +162,6 @@ class MobileCase (CaseGen):
                 deja_tire.append(sommet)
                 self.directions[sommet]=True  
                 nb_direct = nb_direct-1
-        
-     
         
         
     def rotation(self,teta):
@@ -167,10 +174,3 @@ class MobileCase (CaseGen):
         for i in range(4) : 
             indice = (i+teta)%4
             self.directions[indice]= tab[i]
-
-        
-    
-            
-        
-
-            
