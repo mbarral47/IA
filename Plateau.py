@@ -86,6 +86,8 @@ class Labyrinthe:
 
 
 
+""" ATTENTION 
+Si le joueur est sur une des cases qui bougent à cause d'une translation le joueur doit bouger également"""
 
     def modif_joueurs(self,num,opt,mvt):
         """ permet de modifier les position des joueurs et du trésor lors d'une translation
