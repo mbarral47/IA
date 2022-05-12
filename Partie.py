@@ -22,10 +22,12 @@ class jeu :
         print("direction(s) possible(s) pour votre joueur: \n", p)
         t = input("suite à la réponse souhaitez-vous faire une translation: ")
         if (t=="oui"):
-            o = input("ligne - colonne")
+            o = input("ligne - colonne: ")
             c = input("par la gauche ou droite ou haut ou bas : ")
-            n = int(input("et un numéro de ligne ou colonne: "))
-            self.lab.une_translation(o, c, n)
+            n = int(input("et un numéro pair de ligne ou colonne: "))
+            while (n%2!=0):
+                n = int(input("et un numéro pair de ligne ou colonne: "))
+            self.lab.une_translation(o, c, n-1)
             self.lab.DispJeu()
             p = self.lab.avanceBis(joueur)
             
