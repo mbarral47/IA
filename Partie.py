@@ -9,7 +9,6 @@ import Plateau as plat
 path = "/home/barral/Documents/IA/Plateau"
 sys.path.append(path)
 
-
 class jeu :
 
     def __init__(self):
@@ -22,6 +21,11 @@ class jeu :
         print("direction(s) possible(s) pour votre joueur: \n", p)
         t = input("suite à la réponse souhaitez-vous faire une translation: ")
         if (t=="oui"):
+            #optimiser rotation pièce avec touche clavier
+            r = int(input("rotation pièce indiquer quart de tour sens trigo: "))
+            self.lab.motrice.rotation(r)
+            print(self.lab.motrice.toString())
+
             o = input("ligne - colonne: ")
             c = input("par la gauche ou droite ou haut ou bas : ")
             n = int(input("et un numéro pair de ligne ou colonne: "))
@@ -31,30 +35,37 @@ class jeu :
             self.lab.DispJeu()
             p = self.lab.avanceBis(joueur)
             
-            print("Nouvelles direction(s) possible(s) pour votre joueurA: \n", p)
+            
+        if p!=[]:
+            print("direction(s) possible(s) pour votre joueur: \n", p)
             dir = input("indiquez une direction: ")
-        elif p!=[]:
-            dir = input("indiquez une direction: ")
+
+            while dir not in p:
+                dir = input("indiquez une direction: ")
+            else:
+                self.lab.deplaceBis(dir, joueur)
+                self.lab.DispJeu()
+        
+            p = self.lab.avanceBis(joueur)
+            dir="dir"
+
         else:
             print("impossible de bouger une translation aurait été plus judicieux")
+            dir="stop"
+            
 
-        while dir not in p and p!=[]:
-            dir = input("indiquez une direction: ")
-        else:
-            self.lab.deplaceBis(dir, joueur)
-            self.lab.DispJeu()
-        
-        p = self.lab.avanceBis(joueur)
-        dir="dir"
-        while p!=[] and dir!="stop":
-            print("direction(s) possible(s) pour votre joueurA: \n", p)
+       
+        while dir!="stop":
+            print("direction(s) possible(s) pour votre joueur: \n", p)
             dir = input("vous pouvez toujours avancer, indiquez une direction ou stop pour s'arreter: ")
-            if dir!="stop":
+            if (dir!="stop"):
                 self.lab.deplaceBis(dir, joueur)
                 self.lab.DispJeu()
                 p = self.lab.avanceBis(joueur)
-            else:
-                print("au joueur suivant")
+
+        print("")
+        print("au joueur suivant")
+        print("")
     
     def deroulement(self):
         while(True):
