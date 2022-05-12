@@ -9,7 +9,7 @@ import string
 from termcolor import colored, cprint
 
 
-path = "/home/barral/Documents/IA/ProjetLabyrinthe"
+path = "/home/user/Documents/IA&Jeux/ProjetIA/ProjetLabyrinthe.py"
 sys.path.append(path)
 
 def choixlignes(nbdir):
@@ -29,16 +29,16 @@ def choixlignes(nbdir):
     return possibles
 
 def choixcol(t):
+    
     for i in range(len(t)):
         j=random.randint(1,8)
         a=t[i]
-        t[i]=[a,j]
-    print(t)    
-    i=1
+        t[i]=[a,j]    
+    x=1
     b=False
     while not b:
         b=True
-        while i < len(t)-1:
+        while x < len(t)-3:
             if t[i][1]==t[i+1][1]:
                 b=False
                 t[i]=random.randint(1,8)
@@ -48,31 +48,39 @@ def choixcol(t):
 class Labyrinthe:
     def __init__(self):
 
-        self.motrice = pl.MobileCase(1000, 1000)
+        self.motrice = pl.MobileCase(1000, 1000,2)
         self.plateau = []
         self.tresor = [0, 0]
-        self.joueurA = [0, 6]
-        self.joueurB = [6, 0]
+        self.joueurA = [0, 8]
+        self.joueurB = [8, 0]
 
-        for i in range(7):
+        t = choixlignes(4)
+        t=choixcol(t)
+
+        for i in range(9):
             self.plateau.append([])
-            for j in range(7):
+            for j in range(9):
                 contraintes = [0, 0, 0, 0]
-                self.plateau[i].append(pl.MobileCase(i, j))
+                if ([i,j] in t):
+                    dir =3
+                else : 
+                    dir = 2
+                
+                self.plateau[i].append(pl.MobileCase(i, j,dir))
                 if(i % 2 == 0 and j % 2 == 0):
                     if (i == 0):
                         contraintes[1] = 1
 
-                    if (i == 6):
+                    if (i == 8):
                         contraintes[3] = 1
 
                     if (j == 0):
                         contraintes[2] = 1
 
-                    if (j == 6):
+                    if (j == 8):
                         contraintes[0] = 1
 
-                    self.plateau[i][j] = pl.ImmobileCase(j, i, contraintes)
+                    self.plateau[i][j] = pl.ImmobileCase(j, i, contraintes,dir)
         self.tresor[0] = random.randint(2, 4)
         self.tresor[1] = random.randint(2, 4)
 
@@ -90,18 +98,18 @@ class Labyrinthe:
         
         if(self.joueurA[ind]==num):
             self.joueurA[1-ind]=self.joueurA[1-ind]+mvt
-            """ gere si le joueur est ejecté du"""
-            if self.joueurA[1-ind] >6 or self.joueurA[1-ind] <0:
-                self.joueurA=[0,6]
+            """ gere si le joueur est ejecté du plateau"""
+            if self.joueurA[1-ind] >8 or self.joueurA[1-ind] <0:
+                self.joueurA=[0,8]
         
         if(self.joueurB[ind]==num):    
             self.joueurB[1-ind]=self.joueurB[1-ind]+mvt
-            if self.joueurB[1-ind] >6 or self.joueurB[1-ind] <0:
-                self.joueurB=[0,6]
+            if self.joueurB[1-ind] >8 or self.joueurB[1-ind] <0:
+                self.joueurB=[0,8]
         
         if(self.tresor[ind]==num):
             self.tresor[1-ind]=self.tresor[1-ind]+mvt
-            if self.tresor[1-ind] >6 or self.tresor[1-ind] <0:
+            if self.tresor[1-ind] >8 or self.tresor[1-ind] <0:
                 a=random.randint(2,4)
                 b=random.randint(2,4)
                 self.tresor=[a,b]
@@ -109,65 +117,65 @@ class Labyrinthe:
     def une_translation(self, opt, cote, num):
         """ une translation sur une colonne se fait par les i
         une ligne par les j
-        opt = ligne|colonne
+        opt = oui si ligne
         cote = droit|haut|gauche|bas
         num = numéro de la ligne ou colonne
         """
 
-        if (opt=="ligne" and cote == "gauche"):
+        if (opt=="oui" and cote == "gauche"):
             tmp = []
-            for j in range(7):
+            for j in range(9):
 
                 print(self.plateau[num][j].toString())
                 tmp.append(self.plateau[num][j].toMobileCase())
 
             self.plateau[num][0] = self.motrice
-            self.motrice = tmp[6]
+            self.motrice = tmp[8]
             self.modif_joueurs(num,opt,1)
 
-            for j in [1, 2, 3, 4, 5, 6]:
+            for j in range(1,9):
                 self.plateau[num][j] = tmp[j-1]
 
-        elif (opt=="ligne" and cote == "droite"):
+        elif (opt=="oui" and cote == "droite"):
             tmp = []
-            for j in range(7):
+            for j in range(9):
 
                 print(self.plateau[num][j].toString())
                 tmp.append(self.plateau[num][j].toMobileCase())
 
-            self.plateau[num][6] = self.motrice
+            self.plateau[num][8] = self.motrice
             self.motrice = tmp[0]
             self.modif_joueurs(num,opt,-1)
-            for j in [1, 2, 3, 4, 5, 6]:
+            for j in [1, 2, 3, 4, 5, 6,7,8]:
                 self.plateau[num][j-1] = tmp[j]
 
-        elif(opt=="colonne" and cote == "haut"):
+        elif(opt=="non" and cote == "haut"):
             tmp = []
-            for i in range(7):
+            for i in range(9):
 
                 print(self.plateau[i][num].toString())
                 tmp.append(self.plateau[i][num].toMobileCase())
 
             self.plateau[0][num] = self.motrice
-            self.motrice = tmp[6]
+            self.motrice = tmp[8]
             self.modif_joueurs(num,opt,1)
-            for i in [1, 2, 3, 4, 5, 6]:
+            for i in [1, 2, 3, 4, 5, 6,7,8]:
                 self.plateau[i][num] = tmp[i-1]
 
-        elif (opt=="colonne" and cote == "bas"):
+        elif (opt=="non" and cote == "bas"):
 
             tmp = []
-            for i in range(7):
+            for i in range(8):
 
                 print(self.plateau[i][num].toString())
                 tmp.append(self.plateau[i][num].toMobileCase())
 
             self.modif_joueurs(num,opt,1)
-            self.plateau[6][num] = self.motrice
+            self.plateau[8][num] = self.motrice
             self.motrice = tmp[0]
 
 
-            for i in [1, 2, 3, 4, 5, 6]:
+            for i in [1, 2, 3, 4, 5, 6,7,8]:
                 self.plateau[i-1][num] = tmp[i]
 
 
@@ -175,9 +183,9 @@ class Labyrinthe:
     def printGame(self):
         coul = 'white'
         s = ""
-        for i in range(7):
+        for i in range(9):
             s = "".join([s, "\n"])
-            for j in range(7):
+            for j in range(9):
                     coul = 'yellow'
         print(s)
         print("\n ", self.motrice.toString())
@@ -192,14 +200,14 @@ class Labyrinthe:
             return True
 
         elif (direc == "droite" and self.plateau[a][b].directions[0] == True
-              and self.plateau[a][b+1].directions[2] == True and b < 6):
+              and self.plateau[a][b+1].directions[2] == True and b < 8):
             return True
 
         elif (direc == "haut" and self.plateau[a][b].directions[1] == True
               and self.plateau[a-1][b].directions[3] == True and a > 0):
             return True
         elif (direc == "bas" and self.plateau[a][b].directions[3] == True
-              and self.plateau[a+1][b].directions[1] == True and a < 6):
+              and self.plateau[a+1][b].directions[1] == True and a < 8):
             return True
 
         elif(direc == "rester"):
@@ -218,7 +226,7 @@ class Labyrinthe:
                 and self.plateau[a][b-1].directions[0] == True ):
                 res.append("gauche")
 
-        if (self.plateau[a][b].sommet[0] and b < 6):
+        if (self.plateau[a][b].sommet[0] and b < 8):
             if (self.plateau[a][b].directions[0] == True
             and self.plateau[a][b+1].directions[2] == True ):
                 res.append("droite")
@@ -228,7 +236,7 @@ class Labyrinthe:
             and self.plateau[a-1][b].directions[3] == True ):
                 res.append("haut")
         
-        if (self.plateau[a][b].sommet[3] and a < 6):
+        if (self.plateau[a][b].sommet[3] and a < 8):
             if(self.plateau[a][b].directions[3] == True
             and self.plateau[a+1][b].directions[1] == True ):
                 res.append("bas")
@@ -285,14 +293,14 @@ class Labyrinthe:
     def CodeJeu(self):
         tab = []
         
-        for i in range(21):
+        for i in range(27):
             tmp = []
-            for j in range(21):
+            for j in range(27):
                 tmp.append(0)
             tab.append(tmp)
 
-        for ci in range(7) :
-            for cj in range(7):
+        for ci in range(9) :
+            for cj in range(9):
                 
                 
                 tmp2 = self.plateau[ci][cj].coder()
@@ -306,16 +314,24 @@ class Labyrinthe:
     
     def DispJeu(self):
         tab=self.CodeJeu()
-        s=""
-        for i in range(21):
-            for j in range(21):
+        s="\n       1        2       3        4        5        6        7         8        9\n"
+        for i in range(27):
+            for j in range(27):
                 tab[i][j]=int(tab[i][j])
             
-        for i in range(21):
+        for i in range(27):
             if i%3==0:
-                s=s+"\n  ------   ------   ------   ------   ------   ------   ------"
-            s=s+"\n"
-            for j in range(21):
+                s=s+"\n     ------   ------   ------   ------   ------   ------   ------   ------   ------"
+                s=s+"\n   "
+            elif ((i-1)%3==0):
+                st = str((i-1)/3)[0]
+                s = s+"\n"
+                s="".join([s,st])
+                s = s+"  "  
+            else : 
+                s  = s+"\n   "
+
+            for j in range(27):
                 char = "o"
                 sep=""
                 coul='white'
@@ -345,10 +361,7 @@ class Labyrinthe:
         print("\n",self.motrice.toString())
 
 
-
-        
-                
-    """
+"""
 
 if __name__ == "__main__":
 
@@ -357,26 +370,9 @@ if __name__ == "__main__":
     tab = Lab.CodeJeu()
     Lab.DispJeu()
     #print(int(tab[0][2]))
-    
-        
-    
-    #Lab.printGame()
-     
-    a = Lab.motrice.toString()
-    print("\n case a déplacer : ",a)
-     
-    Lab.motrice.rotation(1)
-    a = Lab.motrice.toString()
-    print("\n case déplacée : ",a)
-    
-    Lab.une_translation(False,"haut", 5)
-    Lab.DispJeu()
-     
-    print(Lab.avance("bas", Lab.joueurA))
-    Lab.deplace("haut", Lab.joueurB)
-    Lab.DispJeu()
 
-         """
+"""
+
 
      
    
