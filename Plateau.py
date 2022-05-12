@@ -109,12 +109,12 @@ class Labyrinthe:
     def une_translation(self, opt, cote, num):
         """ une translation sur une colonne se fait par les i
         une ligne par les j
-        opt = oui si ligne
+        opt = ligne|colonne
         cote = droit|haut|gauche|bas
         num = numéro de la ligne ou colonne
         """
 
-        if (opt=="oui" and cote == "gauche"):
+        if (opt=="ligne" and cote == "gauche"):
             tmp = []
             for j in range(7):
 
@@ -128,7 +128,7 @@ class Labyrinthe:
             for j in [1, 2, 3, 4, 5, 6]:
                 self.plateau[num][j] = tmp[j-1]
 
-        elif (opt=="oui" and cote == "droite"):
+        elif (opt=="ligne" and cote == "droite"):
             tmp = []
             for j in range(7):
 
@@ -141,7 +141,7 @@ class Labyrinthe:
             for j in [1, 2, 3, 4, 5, 6]:
                 self.plateau[num][j-1] = tmp[j]
 
-        elif(opt=="non" and cote == "haut"):
+        elif(opt=="colonne" and cote == "haut"):
             tmp = []
             for i in range(7):
 
@@ -154,7 +154,7 @@ class Labyrinthe:
             for i in [1, 2, 3, 4, 5, 6]:
                 self.plateau[i][num] = tmp[i-1]
 
-        elif (opt=="non" and cote == "bas"):
+        elif (opt=="colonne" and cote == "bas"):
 
             tmp = []
             for i in range(7):
