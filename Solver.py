@@ -1,9 +1,12 @@
+
 from re import A
 import Plateau as plat
 import Partie as game
 import random 
 import itertools
 
+
+    
 
 class NoeudGen : 
     
@@ -60,6 +63,8 @@ class Noeud(NoeudGen):
     def __init__(self,v,t):
         self.fils=t
         for i in t :
+            if type(t[i])!=type(NoeudGen(0)):
+                t[i]==Noeud(0,None,None)
             i.setPere(self)
         self.val=v
 
@@ -67,10 +72,17 @@ class Noeud(NoeudGen):
 
     def makeFeuille(self):
         v =self.getVal()
+        p = self.getPere
         self=Feuille(v)
+        self.setPere(p)
 
     def addfils(self,f):
-        self.fils.append(f)
+        for i in f : 
+            if type(i)!=type(NoeudGen(0)):
+                i==Noeud(0,[])
+        self.fils = self.fils +f
+        for i in range(len(self.fils)): 
+            self.fils[i].setPere(self)
 
     def getFils(self,i):
         return self.fils[i]
@@ -101,11 +113,11 @@ class Arbreknaire:
         self.courant = self.courant.getPere()
 
     def addBranch(self,t):
-        fils = self.courant.getFils()
-        fils = fils.append(t)
-        self.courant.setFils(fils)
+        fils = self.courant.addfils(t)
+        
 
-
+    def getCurVal(self):
+        return self.courant.getVal()
 
     
 
@@ -116,25 +128,36 @@ class Solver:
     def __init__(self,lab):
         self.Base = lab
         self.arbre = Arbreknaire()
+
+    def deplacements(self, n, pred,t):
+        p = self.Base.avanceBis(self.Base.joueurB)
+        for deplacement in p :
+            if p[n] != pred[(n+2)%2]:
+
+                tabi = t
+                tabi.append(p[n])
+                self.deplacement(self,pred,tabi)
+                
+
+
         
     def choix (self, joueur):
-       
+        chx = []
         p = self.lab.avanceBis(joueur)
-        print("direction(s) possible(s) pour votre joueur: \n", p)
-        t = ["oui","non"]
-        if (t=="oui"):
+        
+        o = [True,False]
+        c = ["droite","haut","gauche","bas"]
+        n = [1,2,3,4,5,6,7,8,9]
+        self.lab.une_translation(o, c, n)
+        p = self.lab.avanceBis(joueur)
+
+        chx = list(itertools.product(["oui"],o,c,n))
+        chx.append("non")
+
+
+        return chx
             
-            o = [True,False]
-            c = ["droite","haut","gauche","bas"]
-            n = range(1,10)
-            self.lab.une_translation(o, c, n)
-            p = self.lab.avanceBis(joueur)
-            print("Nouvelles direction(s) possible(s) pour votre joueurA: \n", p)
-            dir = input("indiquez une direction: ")
-        elif p!=[]:
-            dir = input("indiquez une direction: ")
-        else:
-            print("impossible de bouger une translation aurait été plus judicieux")
+        
 
         
 
@@ -157,16 +180,11 @@ if __name__=="__main__":
     f1= Feuille("a")
     f2 = Feuille("b")
     t = [f1,f2]
-    n=Noeud("c",t)
-    print(type(n)==type(Noeud(None,None)))
-    print(f1.getVal())
-    print(n.count())
-
-
-
-
-
-
+    a = Arbreknaire()
+    a.addBranch(t)
+    print(a.getCurVal())
+    a.gotoFils(0)
+    print(a.getCurVal())
 
 
 
