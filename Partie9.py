@@ -12,7 +12,7 @@ class jeu :
         self.lab.DispJeu()
     
     def tour(self, joueur):
-        print("Pièce motrice")
+        print("\nPièce motrice")
         self.lab.printMotrice()
         print("\n")
         p = self.lab.avance(joueur)
