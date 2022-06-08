@@ -40,8 +40,8 @@ class Labyrinthe:
                         contraintes[0] = 1
 
                     self.plateau[i][j] = pl.ImmobileCase(j, i, contraintes)
-        self.tresor[0] = random.randint(2, 4)
-        self.tresor[1] = random.randint(2, 4)
+        self.tresor[0] = random.randint(3, 5)
+        self.tresor[1] = random.randint(3, 5)
 
 
 
@@ -84,8 +84,6 @@ class Labyrinthe:
         if (opt=="ligne" and cote == "gauche"):
             tmp = []
             for j in range(9):
-
-                #print(self.plateau[num][j].toString())
                 tmp.append(self.plateau[num][j].toMobileCase())
 
             self.plateau[num][0] = self.motrice
@@ -98,8 +96,6 @@ class Labyrinthe:
         elif (opt=="ligne" and cote == "droite"):
             tmp = []
             for j in range(9):
-
-                #print(self.plateau[num][j].toString())
                 tmp.append(self.plateau[num][j].toMobileCase())
 
             self.plateau[num][8] = self.motrice
@@ -111,8 +107,6 @@ class Labyrinthe:
         elif(opt=="colonne" and cote == "haut"):
             tmp = []
             for i in range(9):
-
-                #print(self.plateau[i][num].toString())
                 tmp.append(self.plateau[i][num].toMobileCase())
 
             self.plateau[0][num] = self.motrice
@@ -125,20 +119,16 @@ class Labyrinthe:
 
             tmp = []
             for i in range(9):
-
-                #print(self.plateau[i][num].toString())
                 tmp.append(self.plateau[i][num].toMobileCase())
 
             self.modif_joueurs(num,opt,1)
             self.plateau[8][num] = self.motrice
             self.motrice = tmp[0]
 
-
             for i in [1, 2, 3, 4, 5, 6, 7, 8]:
                 self.plateau[i-1][num] = tmp[i]
 
-
-            
+                
     def printGame(self):
         coul = 'white'
         s = ""
@@ -147,8 +137,7 @@ class Labyrinthe:
             for j in range(9):
                     coul = 'yellow'
         print(s)
-        print("\n ", self.motrice.toString())
-
+        #print("\n ", self.motrice.toString())
 
 
     def avance(self, joueur):
@@ -179,8 +168,6 @@ class Labyrinthe:
         return res
 
     
-
-
     def deplace(self, direc, joueur):
         if direc == "gauche":
             joueur[1] = joueur[1]-1
@@ -190,7 +177,6 @@ class Labyrinthe:
             joueur[0] = joueur[0]-1
         else:
             joueur[0] = joueur[0]+1
-
 
 
     def CodeJeu(self):
@@ -204,14 +190,11 @@ class Labyrinthe:
 
         for ci in range(9) :
             for cj in range(9):
-                
-                
                 tmp2 = self.plateau[ci][cj].coder()
                 for i in range(3):
                     for j in range(3):
                         tab[ci*3+i][cj*3+j] = tmp2[i][j]
-                    
-                
+         
         return tab
     
     
@@ -261,9 +244,5 @@ class Labyrinthe:
                 s = sep.join([s, string])
                 
         print(s)
-        print("\n",self.motrice.toString())
+        #print("\n",self.motrice.toString())
 
-
-
-        
-    
