@@ -13,6 +13,7 @@ class jeu :
         self.lab.DispJeu()
     
     def tour(self, joueur):
+        print(self.lab.motrice.toString())
         p = self.lab.avance(joueur)
         print("direction(s) possible(s) pour votre joueur: \n", p)
         t = input("suite à la réponse souhaitez-vous faire une translation: ")
