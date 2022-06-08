@@ -8,37 +8,46 @@ sys.path.append(path)
 class jeu :
 
     def __init__(self):
-        #générer un plateau
         self.lab = plat.Labyrinthe()
         self.lab.DispJeu()
     
     def tour(self, joueur):
-        print(self.lab.motrice.toString())
+        print("Pièce motrice")
+        self.lab.printMotrice()
+        print("\n")
         p = self.lab.avance(joueur)
-        print("direction(s) possible(s) pour votre joueur: \n", p)
-        t = input("suite à la réponse souhaitez-vous faire une translation: ")
+        print("Direction(s) possible(s) pour votre joueur : \n", p)
+        t = input("Suite à la réponse souhaitez-vous faire une translation? : ")
+
         if (t=="oui"):
             #optimiser rotation pièce avec touche clavier
-            r = int(input("rotation pièce indiquer quart de tour sens trigo: "))
+            r = int(input("Rotation pièce, indiquez le(s) quart(s) de tour dans le sens trigonométrique : "))
             self.lab.motrice.rotation(r)
-            print(self.lab.motrice.toString())
+            self.lab.printMotrice()
+            print("\nLa translation doit se faire ")
 
-            o = input("ligne - colonne: ")
+            o = input("par une ligne ou une colonne : ")
+            while(o not in ["ligne", "colonne"]):
+                o = input("par une ligne ou une colonne : ")
             c = input("par la gauche ou droite ou haut ou bas : ")
-            n = int(input("et un numéro pair de ligne ou colonne: "))
+            while(c not in p):
+                c = input("par la gauche ou droite ou haut ou bas : ")
+            n = int(input("et un numéro pair de ligne ou colonne : "))
             while (n%2!=0):
-                n = int(input("et un numéro pair de ligne ou colonne: "))
+                n = int(input("et un numéro pair de ligne ou colonne : "))
+            
             self.lab.une_translation(o, c, n-1)
             self.lab.DispJeu()
             p = self.lab.avance(joueur)
             
             
         if p!=[]:
-            print("direction(s) possible(s) pour votre joueur: \n", p)
-            dir = input("indiquez une direction: ")
+            print("\n")
+            print("Direction(s) possible(s) pour votre joueur: \n", p)
+            dir = input("Indiquez une direction: ")
 
             while dir not in p:
-                dir = input("indiquez une direction: ")
+                dir = input("Indiquez une direction: ")
             else:
                 self.lab.deplace(dir, joueur)
                 self.lab.DispJeu()
@@ -47,22 +56,21 @@ class jeu :
             dir="dir"
 
         else:
-            print("impossible de bouger une translation aurait été plus judicieux")
+            print("Impossible de bouger une translation aurait été plus judicieux")
             dir="stop"
             
 
        
         while dir!="stop":
-            print("direction(s) possible(s) pour votre joueur: \n", p)
-            dir = input("vous pouvez toujours avancer, indiquez une direction ou stop pour s'arreter: ")
+            print("\n")
+            print("Direction(s) possible(s) pour votre joueur: \n", p)
+            dir = input("Vous pouvez toujours avancer, indiquez une direction ou stop pour s'arreter: ")
             if (dir!="stop"):
                 self.lab.deplace(dir, joueur)
                 self.lab.DispJeu()
                 p = self.lab.avance(joueur)
 
-        print("")
-        print("au joueur suivant")
-        print("")
+
     
     def deroulement(self):
         while(True):
@@ -70,10 +78,16 @@ class jeu :
             if self.lab.joueurA==self.lab.tresor :
                 print("VICTOIRE JOUEUR A")
                 break
+            print("")
+            print("au joueur suivant")
+            print("")
             self.tour(self.lab.joueurB)
             if self.lab.joueurB==self.lab.tresor:
                 print("VICTOIRE JOUEUR B")
                 break
+            print("")
+            print("au joueur suivant")
+            print("")
 
 if __name__=="__main__" :
     j=jeu()
