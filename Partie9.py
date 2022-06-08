@@ -1,9 +1,5 @@
 
 import sys
-#import random
-#import ProjetLabyrinthe as pl
-#import string
-#from termcolor import colored, cprint
 import Plateau9 as plat
 
 path = "/Plateau9"
@@ -17,7 +13,7 @@ class jeu :
         self.lab.DispJeu()
     
     def tour(self, joueur):
-        p = self.lab.avanceBis(joueur)
+        p = self.lab.avance(joueur)
         print("direction(s) possible(s) pour votre joueur: \n", p)
         t = input("suite à la réponse souhaitez-vous faire une translation: ")
         if (t=="oui"):
@@ -33,7 +29,7 @@ class jeu :
                 n = int(input("et un numéro pair de ligne ou colonne: "))
             self.lab.une_translation(o, c, n-1)
             self.lab.DispJeu()
-            p = self.lab.avanceBis(joueur)
+            p = self.lab.avance(joueur)
             
             
         if p!=[]:
@@ -43,10 +39,10 @@ class jeu :
             while dir not in p:
                 dir = input("indiquez une direction: ")
             else:
-                self.lab.deplaceBis(dir, joueur)
+                self.lab.deplace(dir, joueur)
                 self.lab.DispJeu()
         
-            p = self.lab.avanceBis(joueur)
+            p = self.lab.avance(joueur)
             dir="dir"
 
         else:
@@ -59,9 +55,9 @@ class jeu :
             print("direction(s) possible(s) pour votre joueur: \n", p)
             dir = input("vous pouvez toujours avancer, indiquez une direction ou stop pour s'arreter: ")
             if (dir!="stop"):
-                self.lab.deplaceBis(dir, joueur)
+                self.lab.deplace(dir, joueur)
                 self.lab.DispJeu()
-                p = self.lab.avanceBis(joueur)
+                p = self.lab.avance(joueur)
 
         print("")
         print("au joueur suivant")
