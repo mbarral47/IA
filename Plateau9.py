@@ -5,9 +5,7 @@
 import random
 import ProjetLabyrinthe9 as pl
 import sys
-#import string
 from termcolor import colored
-#, cprint
 
 
 path = "/ProjetLabyrinthe9"
@@ -153,7 +151,7 @@ class Labyrinthe:
 
 
 
-    def avanceBis(self, joueur):
+    def avance(self, joueur):
         a = joueur[0]
         b = joueur[1]
         res = []
@@ -183,7 +181,7 @@ class Labyrinthe:
     
 
 
-    def deplaceBis(self, direc, joueur):
+    def deplace(self, direc, joueur):
         if direc == "gauche":
             joueur[1] = joueur[1]-1
         elif direc == "droite":
