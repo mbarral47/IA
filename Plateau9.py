@@ -7,7 +7,6 @@ import ProjetLabyrinthe9 as pl
 import sys
 from termcolor import colored
 
-
 path = "/ProjetLabyrinthe9"
 sys.path.append(path)
 
@@ -42,8 +41,6 @@ class Labyrinthe:
                     self.plateau[i][j] = pl.ImmobileCase(j, i, contraintes)
         self.tresor[0] = random.randint(3, 5)
         self.tresor[1] = random.randint(3, 5)
-
-
 
 
     def modif_joueurs(self,num,opt,mvt):
@@ -128,7 +125,6 @@ class Labyrinthe:
             for i in [1, 2, 3, 4, 5, 6, 7, 8]:
                 self.plateau[i-1][num] = tmp[i]
 
-                
     def printGame(self):
         coul = 'white'
         s = ""
@@ -137,7 +133,6 @@ class Labyrinthe:
             for j in range(9):
                     coul = 'yellow'
         print(s)
-        #print("\n ", self.motrice.toString())
 
 
     def avance(self, joueur):
@@ -167,7 +162,7 @@ class Labyrinthe:
 
         return res
 
-    
+
     def deplace(self, direc, joueur):
         if direc == "gauche":
             joueur[1] = joueur[1]-1
@@ -189,12 +184,12 @@ class Labyrinthe:
             tab.append(tmp)
 
         for ci in range(9) :
-            for cj in range(9):
+            for cj in range(9):         
                 tmp2 = self.plateau[ci][cj].coder()
                 for i in range(3):
                     for j in range(3):
                         tab[ci*3+i][cj*3+j] = tmp2[i][j]
-         
+                           
         return tab
     
     
@@ -244,5 +239,24 @@ class Labyrinthe:
                 s = sep.join([s, string])
                 
         print(s)
-        #print("\n",self.motrice.toString())
+    
+    def printMotrice(self):
+        s=""
+        c = self.motrice.coder()
+        for i in range(3):
+            s  = s+"\n  "
+            for j in range(3):
+                char = "o"
+                sep=""
+                coul='white'
+                
+                if(c[i][j]==1)  :
+                    char = "  "
+                elif(int(c[i][j])==0):
+                    char = "▓ "
+                
+                string = colored(char, coul, attrs=['bold'])
+                s = sep.join([s,string])
+        print(s)
+
 
