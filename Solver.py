@@ -1,11 +1,13 @@
 
 from json.encoder import HAS_UTF8
 from re import A, S
-import Plateau as plat
-import Partie as game
+import Plateau9 as plat
+import Partie9 as game
 import random 
 import itertools
-import copy 
+import copy
+from math import sqrt
+
 
 def dirToDigit(t):
        
@@ -129,11 +131,11 @@ class Noeud(NoeudGen):
 class informations : 
     
     def __init__(self):
-        #moyenne des valeurs heuristiques des feuilles du noeuds
+        """moyenne des valeurs heuristiques des feuilles du noeuds"""
         self.V=0
-        #sommme des valeurs heuristiques du noeud. 
+        """sommme des valeurs heuristiques du noeud.""" 
         self.t=0
-        #nombre de visites
+        """nombre de visites"""
         self.n=0
 
 class Arbreknaire:
@@ -173,42 +175,11 @@ class Arbreknaire:
         for j in self.courant.getAllFils() :
             j.setPere(g)
 
-
-        
-
     def getCurVal(self):
         return self.courant.getVal()
 
     def setCurVal(self,v):
-        self.courant.val = v
-
-    def listify(self,tab): 
-        
-        
-        ptrf = self.getCurrent()
-        if type(self.courant)!=type(Feuille(0)):
-            
-            t = []
-            #ptrf sert de pointeur de référence pour repositionner l'element cournat après la remontée de l'arbre
-            
-            while self.courant != self.root :
-                a= self.getCurVal()
-                t.append(a)
-                self.gotoFather()
-            t.append(self.root.getVal())
-            t = list(reversed(t))
-            return [t]
-
-        elif type(self.courant)==type(Noeud(0,[])):
-            for i in range(len(self.courant.fils)) : 
-                self.gotoFils(i)
-                tab = tab + self.listify(tab)
-                self.courant = ptrf
-                self.gotoFather
-            
-            return tab
-                
-            
+        self.courant.val = v    
 
     def dispArbre(self):
         
@@ -228,7 +199,16 @@ class Arbreknaire:
             s = s + " )"
             return s
                 
-            
+class SNode :
+    
+    def __init__(self):
+        self.nbex=0
+        """nombre d'exploration du noeud"""
+        self.total =0
+        """total des valeurs moyennes des noeuds fils"""
+        self.vi = 0
+        """valeur moyenne sur le nombre des fils"""
+    
 
 
 class Solver: 
@@ -239,7 +219,7 @@ class Solver:
         self.lab = labyrinthe
         self.arbre = Arbreknaire()
 
-#méthode qui calcule récursivement les déplacements possibles sans retour en arrière
+
     
     def getLab(self):
         return self.lab
@@ -249,16 +229,16 @@ class Solver:
     
     def movlist(self,visite,l,tab):
         
-        """fonction récursive qui ajoute le chemin l à tab"""
+        """fonction qui calcule récursivements les déplacements possibles depuis une position et l'ajoute à tab"""
         
-        p = self.lab.avanceBis(self.lab.joueurB)
+        p = self.lab.avance(self.lab.joueurB)
         l1 = l.copy()
-        print(p)
+        #print(p)
         for i in p : 
             l = l1
             self.lab.deplace(i,self.lab.joueurB)
             if self.lab.joueurB not in visite :
-                print("ici")
+                #print("ici")
                 l = l+ [i]
                 visite.append(self.lab.joueurB)
                 tab.append(l)
@@ -266,55 +246,74 @@ class Solver:
 
             self.lab.deplace(self.inv[i],self.lab.joueurB)
 
+ 
 
 
 
-
- #calcule la liste de toutes les séquences de choix possibles pour un joueur et un tour donné.       
+    """calcule la liste de toutes les séquences de choix 
+    possibles pour un joueur et un tour donné."""    
     
-    def choix (self,joueur):
+    def choix (self):
         chx = []
         #differentes possibilités de translations ou aucune
-        p = self.lab.avanceBis(joueur)
+        p = self.lab.avance(self.lab.joueurB)
         o = [True,False]
         c = ["droite","haut","gauche","bas"]
         n = [1,2,3,4,5,6,7,8,9]
-    
-        chx = list(itertools.product(["oui"],o,c,n))
+        rot = [0,1,2,3]
+
+        """rot correspond aux rotations possibles de la case motrice.
+        On remarque qu'avant même d'avoir fait les déplacements, la liste des possibilités est grande
+         = 288 coupq """
+
+        chx = list(itertools.product(["oui"],rot,o,c,n))
         chx.append("non")
         copielab = self.lab
 
-        #ajouter aux coups possibles tous les déplacements possibles
-        
-        
         for ch in chx :
-            visites = []
-            a = Arbreknaire()
+            
 
             self.lab = copielab
             if ch[0]=="oui":
-                self.lab.une_translation(ch[1],ch[2],ch[3])
-            if self.lab.joueurB not in visites :
-                visites.append(self.lab.joueurB)
-            
-            self.deplacements(a,visites)
-            l = [ch]
-            a.listify(l)
-            chx.append(ch)
-           
 
+                self.lab.motrice.rotation(ch[1])
+                self.lab.une_translation(ch[2],ch[3],ch[4])
+               
+                self.movlist([],[],chx)
+                """ on fait une translation inverse et on remet la case motrice à la position initiale
+                pour contourner les contraintes de programmation orientée objet."""
+               
+                self.lab.une_translation(ch[2],self.inv[ch[3]],ch[4])
+                self.lab.motrice.rotation(4-ch[1])
+            else :
+
+                self.movlist([],ch,chx)
+                
         return chx
             
         
 
         
 
-    def UCB1(self,node):
-        
-        return 100000000
+    def UCB1(self):
+        """UCB1 s'effectue sur le noeud courant vers les noeuds fils"""
+        ucb = 100000000
+        if self.arbre.courant.getVal().nbex !=0:
+            pass
+        return ucb
 
     def backPropagation(self):
-        pass
+        """on suppose que le noeud courant de l'arbre est en bas. On va donc changer la valeur 
+        moyenne de tous ses parents"""
+        
+        while self.arbre.courant != self.arbre.root :
+            self.arbre.gotoFather()
+            n = len(self.arbre.courant.getAllFils)
+            m=0
+            for i in range(n):
+                m = m+self.arbre.courant.getFils(i).getVal().total
+            self.arbre.courant.vi = m/n
+
 
     def expansion(self):
         pass
@@ -323,17 +322,14 @@ class Solver:
         pass
 
 
-"""
+
 if __name__=="__main__":
     
     
-   
-    
-    
     lb = plat.Labyrinthe()
-    lb.DispJeu()
     solver = Solver(lb)
     tableau = []
     solver.movlist([],[],tableau)
-    print(tableau)
-"""   
+    print(solver.choix())
+    
+ 
