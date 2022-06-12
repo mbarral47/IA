@@ -17,7 +17,7 @@ class jeu :
         print("\n")
         p = self.lab.avance(joueur)
         print("Direction(s) possible(s) pour votre joueur : \n", p)
-        t = input("Suite à la réponse souhaitez-vous faire une translation? : ")
+        t = input("Suite à la réponse souhaitez-vous faire une translation ? : ")
 
         if (t=="oui"):
             r = int(input("Rotation pièce, indiquez le(s) quart(s) de tour dans le sens trigonométrique : "))
@@ -55,7 +55,7 @@ class jeu :
             dir="dir"
 
         else:
-            print("Impossible de bouger une translation aurait été plus judicieux")
+            print("Impossible de bouger une translation aurait été plus judicieuse")
             dir="stop"
             
 
