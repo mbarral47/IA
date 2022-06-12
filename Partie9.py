@@ -20,7 +20,6 @@ class jeu :
         t = input("Suite à la réponse souhaitez-vous faire une translation? : ")
 
         if (t=="oui"):
-            #optimiser rotation pièce avec touche clavier
             r = int(input("Rotation pièce, indiquez le(s) quart(s) de tour dans le sens trigonométrique : "))
             self.lab.motrice.rotation(r)
             self.lab.printMotrice()
