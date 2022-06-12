@@ -69,7 +69,20 @@ class jeu :
                 self.lab.DispJeu()
                 p = self.lab.avance(joueur)
 
+    def tourOrdi (self, tab):
+        #ex, tab = [["oui"], ["ligne", "gauche", 2], ["haut", "droite"]]
 
+        if tab[0][0] == "oui":
+            o = tab[1][0]
+            c = tab[1][1]
+            n = tab[1][2]
+            self.lab.une_translation(o, c, n-1)
+
+        for dir in tab[2]:
+            self.lab.deplace(dir, self.lab.joueurB)
+
+        self.lab.DispJeu()
+        
     
     def deroulement(self):
         while(True):
@@ -80,7 +93,10 @@ class jeu :
             print("")
             print("au joueur suivant")
             print("")
-            self.tour(self.lab.joueurB)
+            #self.tour(self.lab.joueurB)
+            tab = [["oui"], ["ligne", "gauche", 2], ["haut"]]
+            self.tourOrdi(tab)
+            
             if self.lab.joueurB==self.lab.tresor:
                 print("VICTOIRE JOUEUR B")
                 break
