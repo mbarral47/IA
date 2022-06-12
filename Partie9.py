@@ -26,15 +26,15 @@ class jeu :
             self.lab.printMotrice()
             print("\nLa translation doit se faire ")
 
-            o = input("par une ligne ou une colonne : ")
+            o = input("  par une ligne ou une colonne : ")
             while(o not in ["ligne", "colonne"]):
-                o = input("par une ligne ou une colonne : ")
-            c = input("par la gauche ou droite ou haut ou bas : ")
+                o = input("  par une ligne ou une colonne : ")
+            c = input("  par la gauche ou droite ou haut ou bas : ")
             while(c not in ["droite", "gauche", "haut", "bas"]):
-                c = input("par la gauche ou droite ou haut ou bas : ")
-            n = int(input("et un numéro pair de ligne ou colonne : "))
+                c = input("  par la gauche ou droite ou haut ou bas : ")
+            n = int(input("  et un numéro pair de ligne ou colonne : "))
             while (n%2!=0):
-                n = int(input("et un numéro pair de ligne ou colonne : "))
+                n = int(input("  et un numéro pair de ligne ou colonne : "))
             
             self.lab.une_translation(o, c, n-1)
             self.lab.DispJeu()
