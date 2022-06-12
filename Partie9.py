@@ -30,7 +30,7 @@ class jeu :
             while(o not in ["ligne", "colonne"]):
                 o = input("par une ligne ou une colonne : ")
             c = input("par la gauche ou droite ou haut ou bas : ")
-            while(c not in p):
+            while(c not in ["droite", "gauche", "haut", "bas"]):
                 c = input("par la gauche ou droite ou haut ou bas : ")
             n = int(input("et un numéro pair de ligne ou colonne : "))
             while (n%2!=0):
