@@ -70,15 +70,21 @@ class jeu :
                 p = self.lab.avance(joueur)
 
     def tourOrdi (self, tab):
-        #ex, tab = [["oui"], ["ligne", "gauche", 2], ["haut", "droite"]]
+        #ex, tab = [["oui"], [3,"ligne", "gauche", 2], ["haut", "droite"]]
 
         if tab[0][0] == "oui":
-            o = tab[1][0]
-            c = tab[1][1]
-            n = tab[1][2]
+            r = tab[1][0]
+            self.lab.motrice.rotation(r)
+            o = tab[1][1]
+            c = tab[1][2]
+            n = tab[1][3]
             self.lab.une_translation(o, c, n-1)
 
         for dir in tab[2]:
+            p = self.lab.avance(self.lab.joueurB)
+            if dir not in p:
+                print("impossible")
+                break
             self.lab.deplace(dir, self.lab.joueurB)
 
         self.lab.DispJeu()
@@ -88,20 +94,20 @@ class jeu :
         while(True):
             self.tour(self.lab.joueurA)
             if self.lab.joueurA==self.lab.tresor :
-                print("VICTOIRE JOUEUR A")
+                print("Vous avez gagné")
                 break
             print("")
-            print("au joueur suivant")
+            print("A l'ordinateur")
             print("")
             #self.tour(self.lab.joueurB)
-            tab = [["oui"], ["ligne", "gauche", 2], ["haut"]]
+            tab = [["oui"], [3,"ligne", "gauche", 2], ["haut"]]
             self.tourOrdi(tab)
             
             if self.lab.joueurB==self.lab.tresor:
-                print("VICTOIRE JOUEUR B")
+                print("Vous avez perdu")
                 break
             print("")
-            print("au joueur suivant")
+            print("A vous de jouer")
             print("")
 
 if __name__=="__main__" :
