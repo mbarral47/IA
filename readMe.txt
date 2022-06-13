@@ -2,7 +2,8 @@ Jeu : Le Labyrinthe
 
 Règles du jeu
 Sur un plateau de 81 cases (9 par 9), certaines cases sont mobiles et d'autres non, un trésor est placé au centre et 2 joueurs placés aux extrémités opposées.
-But du jeu : Pour gagner, il faut arriver le premier au trésor, pour ce faire le joueur peut faire glisser les cases en insérant une énième case, ou bien se déplacer directement si le circuit est fait. Les joueurs jouent à tour de rôle.
+But du jeu : Pour gagner, il faut arriver le premier au trésor, pour ce faire le joueur peut se dépalcer directement si un chemin se dessine ou
+faire glisser les cases en insérant une énième case et se déplacer ensuite. Les joueurs jouent à tour de rôle.
 
 Dossier
 Notre dossier se compose de trois fichiers:
