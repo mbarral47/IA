@@ -11,6 +11,9 @@ from copy import copy
 from math import sqrt
 from math import log
 
+def dist(a,b):
+        """distance euclidienne"""
+        return (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1])
 
 
 class NoeudGen : 
@@ -57,7 +60,7 @@ class NoeudGen :
 
 
 
-class Feuille (NoeudGen):
+class Feuille(NoeudGen):
     def __init__(self,v):
         self.pere = None
         self.val =v
@@ -99,24 +102,12 @@ class Noeud(NoeudGen):
     
     def getAllFils(self):
         return self.fils
-        
 
-class informations : 
-    
-    def __init__(self):
-        """moyenne des valeurs heuristiques des feuilles du noeuds"""
-        self.V=0
-        """sommme des valeurs heuristiques du noeud.""" 
-        self.t=0
-        """nombre de visites"""
-        self.n=0
-        """dictionnaire des actions qui permettent d'aller à un fils"""
-        self.act = {}
 
 class Arbreknaire:
     
     def __init__(self):
-        self.root = Feuille(0)
+        self.root = Noeud(0,[])
         self.root.setPere(self.root)
         self.courant = self.root
 
@@ -146,7 +137,7 @@ class Arbreknaire:
                 i = Feuille(i)
 
         self.courant.addfils(t)
-
+        g = self.getCurrent()
         for j in self.courant.getAllFils() :
             j.setPere(g)
 
@@ -154,7 +145,8 @@ class Arbreknaire:
         return self.courant.getVal()
 
     def setCurVal(self,v):
-        self.courant.val = v    
+        self.courant.val = v  
+
 
     def dispArbre(self):
         
@@ -175,6 +167,7 @@ class Arbreknaire:
             return s
                 
 class SNode :
+    """ Type de valeurs contenue dans les noeuds du solver"""
     
     def __init__(self):
         self.nbex=0
@@ -183,11 +176,22 @@ class SNode :
         """total des valeurs moyennes des noeuds fils"""
         self.vi = 0
         """valeur moyenne sur le nombre des fils"""
-    
-    def dist(self,a,b):
-        """distance euclidienne"""
-        return (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1])
+        self.act = []
+        """chaque case du tableau correspond au coups à jouer pour arriver à un état fils"""
 
+    def setVi(self,v):
+        self.vi=v
+    
+    def setTotal(self,v):
+        self.total=v
+
+    def setNbex(self,v):
+        self.nbex=v
+    
+    def addaction(self,a):
+        self.act.append(a)
+    
+    
 class Solver: 
 
 
@@ -222,13 +226,14 @@ class Solver:
             p[a:a+1]=[]
         
         for i in p : 
-
+            """nb les copy() sont necessaires pour pouvoir utiliser la récursivité. Sinon les paramètres d'entrée seraient
+            modifiés d'un noeud frère à l'autre"""
             l = l1.copy()
             visite = v1.copy()
             n = len(visite)
             
             self.lab.deplace(i,self.lab.joueurB)
-
+            """filter le deplacement pour empecher un cycle """
             if self.lab.joueurB not in visite:
                 
                 l.append(i)
@@ -254,7 +259,7 @@ class Solver:
         On remarque qu'avant même d'avoir fait les déplacements, la liste des possibilités est grande: 288 coups """
 
         chx = list(itertools.product(["oui"],rot,o,c,n))
-        chx.append("non")
+        chx.append(["non"])
         cplab = self.lab.copieLab()
         print(chx)
         
@@ -299,11 +304,14 @@ class Solver:
         
         while self.arbre.courant != self.arbre.root :
             self.arbre.gotoFather()
-            n = len(self.arbre.courant.getAllFils)
+            n = len(self.arbre.courant.getAllFils())
             m=0
             for i in range(n):
-                m = m+self.arbre.courant.getFils(i).getVal().total
-            self.arbre.courant.vi = m/n
+    
+                m = m+int(self.arbre.courant.getFils(i).getVal().total)
+            self.arbre.courant.val.setTotal(m)
+            self.arbre.courant.val.setVi(m/n)
+
 
     def effectMov(self,l):
         """permet d'effectuer les mouvements contenus dans une liste de mouvements (au bon format)"""
@@ -318,21 +326,6 @@ class Solver:
         for d in l:
             self.lab.deplace(d,self.lab.joueurB)
 
-        
-
-
-    def expansion(self):
-        pass
-
-    def exploration(self):
-        ch=-1000000
-        i=0
-        while i < len(self.arbre.courant.getAllFils()):
-            self.arbre.gotoFils(i)
-            u = self.UCB1()
-            ch = min(u,ch)
-            i+=1 
-        return i 
 
     def simulation(self,n,k):
         
@@ -347,7 +340,7 @@ class Solver:
                     cote = random.choice(["droite","gauche"])
                 else:
                     cote = random.choice(["haut","bas"])
-                num = random.choice(1,3,5,7)
+                num = random.choice([1,3,5,7])
                 self.lab.motrice.rotation(rot)
                 self.lab.une_translation(opt,cote,num)
             
@@ -358,23 +351,82 @@ class Solver:
                 if len(p)==1 :
                     """ si le seul déplacement que l'on peut faire est de rebrousser chemin"""
                     break
-                else : 
+                elif  dep in self.inv.keys(): 
                     a = p.index(self.inv[dep])
                     p[a:a+1]=[]
                     a = random.randint(1,len(p))
-                    """ au une chance sur len(p) de s'arrêter avant"""
+                    """ a une chance sur len(p) de s'arrêter avant"""
                     if a==1:
                         break
                     else:
                         dep = random.choice(p)
                         self.lab.deplacement(dep,self.lab.joueurB)
-            self.courant.val.t = 0
-            self.courant.val.vi = 0
 
+            self.arbre.courant.val.setTotal(dist(self.lab.joueurB , self.lab.tresor))
+            self.arbre.courant.val.setVi(dist(self.lab.joueurB, self.lab.tresor))
+
+    def mcts(self):
+        if type(self.arbre.courant) == type(Feuille(0)):
             
-    
-    def monte_Carlo(self):
-        pass
+            ni = self.arbre.courant.val.nbex
+            if ni ==0:
+                self.arbre.courant.val.setNbex(ni +1)
+                ptr = self.arbre.getCurrent()
+                """la fonction backpropagation nous ramène à la racine. ptr pointe vers l'ancienne feuille courante"""
+                self.simulation()
+                """simulation d'une partie depuis la configuration courante"""
+                self.backPropagation()
+                """mise à jour des valeurs pour tous les noeuds courants"""
+                self.arbre.courant = ptr
+            choices = self.choix()
+            for c in range(len(choices)):
+                """ajouter chaque choix possible au fils et ajouter l'action nécessaire."""
+                self.arbre.addBranch([Feuille(c[i])])
+                self.arbre.courant.getFils(i).val.addaction(c[i])
+
+            if len(self.arbre.courant.getAllFils)!=0:
+                self.arbre.gotoFils(0)
+                self.arbre.courant.val.setNbex(1)
+                self.simulation()
+        else :
+            t = self.arbre.courant.getAllFils()
+            k=0
+            min =-100000000
+            """obtenir argmax(i, UCB1(fils(i))"""
+            for i in range(len(t)):
+                self.arbre.gotoFils(i)
+                if min < self.UCB1():
+                    k=i
+                    min = self.UCB1
+                self.arbre.gotoFather()
+                """effectuer l'action du fils k pour chaner la configuration du jeu"""
+                self.effectMov(self.courant.val.act[k])
+            self.arbre.gotoFils(k)
+            self.mtcs()
+                    
+                
+
+                
+
+
+    def monteCarloTreeSearch(self,n):
+        """fonction finale du Solver. n est le nombre d'itérations souhaité retourne un tableau d'instruction"""
+        cplb = self.lab.copieLab()
+        for i in range(n):
+            self.lab = cplb.copieLab()
+            self.arbre.courant = self.arbre.root
+            self.mcts()
+        """retourner l'action qui maximise vi"""
+        t = self.arbre.root.getAllFils()
+        k=0
+        max = -100000000
+        for i in t:
+            if max < i.val.vi: 
+                max = i.val.vi
+                k=t.index(i)
+        return self.arbre.root.val.act[k]
+
+
 
 
 
@@ -382,6 +434,9 @@ if __name__=="__main__":
     
     lb = plat.Labyrinthe()
     solver = Solver(lb)
+    a = Arbreknaire()
+    solver.mcts()
+
     
     
 
