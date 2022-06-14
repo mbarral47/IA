@@ -10,10 +10,11 @@ from copy import copy
 
 from math import sqrt
 from math import log
+from math import exp
 
-def dist(a,b):
+def heuristique(a,b):
         """distance euclidienne"""
-        return (a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1])
+        return 1000 * exp (   -((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]))   )
 
 
 class NoeudGen : 
@@ -49,7 +50,7 @@ class NoeudGen :
         return s
             
     def count(self):
-        print(type(self))
+        
         c = 1
         if type(self)==type(Noeud(None,None)):
     
@@ -107,7 +108,7 @@ class Noeud(NoeudGen):
 class Arbreknaire:
     
     def __init__(self):
-        self.root = Noeud(0,[])
+        self.root = Feuille(0)
         self.root.setPere(self.root)
         self.courant = self.root
 
@@ -121,16 +122,23 @@ class Arbreknaire:
     def gotoFather(self):
         self.courant = self.courant.getPere()
 
+    def gotoRoot(self):
+        self.courant = self.root
+
     def addBranch(self,t):
     
         if type(self.courant) == type(Feuille(0)):
-            
-            p = self.courant.getPere()
-            v= self.getCurVal()
             g = self.getCurrent()
-            self.courant = Noeud(v,[])
-            self.courant.setPere(p)
-
+            p= g.getPere()
+            v= g.getVal()
+            g = Noeud(v,[])
+            g.setPere(p)
+            
+            if self.courant == self.root:
+                self.root=g
+            self.courant = g
+            
+    
         
         if type(t[0]) != type(NoeudGen(0)):
             for i in t :
@@ -190,6 +198,12 @@ class SNode :
     
     def addaction(self,a):
         self.act.append(a)
+
+    def getNbex(self):
+        return self.nbex
+
+    def getTotal(self):
+        return self.total
     
     
 class Solver: 
@@ -250,19 +264,20 @@ class Solver:
     def choix (self):
         """calcule la liste de toutes les séquences de choix possibles pour un joueur et un tour donné."""      
         chx = []
-        o = [True,False]
+        o = ["ligne","colonne"]
         c = ["droite","haut","gauche","bas"]
-        n = [1,2,3,4,5,6,7,8,9]
+        n = [1,3,5,7]
         rot = [0,1,2,3]
 
         """rot correspond aux rotations possibles de la case motrice.
-        On remarque qu'avant même d'avoir fait les déplacements, la liste des possibilités est grande: 288 coups """
+        On remarque qu'avant même d'avoir fait les déplacements, la liste des possibilités est grande: 64"""
 
-        chx = list(itertools.product(["oui"],rot,o,c,n))
+        ch1 = list(itertools.product(["oui"],rot,["ligne"],["droite","gauche"],n))
+        ch2 = list(itertools.product(["oui"],rot,["colonne"],["haut","bas"],n))
+        chx = ch1 + ch2
         chx.append(["non"])
         cplab = self.lab.copieLab()
-        print(chx)
-        
+    
         for i in range(len(chx)) :
             t =[]
             chx[i]=list(chx[i])
@@ -272,13 +287,15 @@ class Solver:
                 self.lab.une_translation(chx[i][2],chx[i][3],chx[i][4])
             self.movlist([],[],t,"bonjour")
             for j in t :
-                
-                chx.append(chx[i] + j)
+
+                tab = j.copy()
+                chx.append(chx[i].copy() + tab)
 
             if i>288:
                 return chx
-        
-        
+        choix2 = chx[:65]
+        chx[:65]=[]
+        chx = choix2 + chx
         return chx
             
         
@@ -287,7 +304,7 @@ class Solver:
 
     def UCB1(self):
         """UCB1 s'effectue sur le noeud sur lequel on veut calculer la valeur ucb1"""
-        ucb = 100000000
+        ucb = 1000
         if self.arbre.courant.getVal().nbex !=0:
             
             ni =self.arbre.courant.getVal().nbex
@@ -313,22 +330,22 @@ class Solver:
             self.arbre.courant.val.setVi(m/n)
 
 
-    def effectMov(self,l):
+    def effectMov(self,ch):
         """permet d'effectuer les mouvements contenus dans une liste de mouvements (au bon format)"""
         p=1
-        if ch[0]=="oui":
+        c = ch.copy()
+        if c[0]=="oui":
 
-            self.lab.motrice.rotation(ch[1])
-            self.lab.une_translation(ch[2],ch[3],ch[4])
-            l[0:5]=[]
+            self.lab.motrice.rotation(c[1])
+            self.lab.une_translation(c[2],c[3],c[4])
+            c[0:5]=[]
         else :
-            l[0:1]=[]
-        for d in l:
+            c[0:1]=[]
+        for d in c:
             self.lab.deplace(d,self.lab.joueurB)
 
 
     def simulation(self,n,k):
-        
         """il n'est pas certain que la simulation converge vers un état terminal, c'est pourquoi n limite le nombre
         de tour."""
         for i in range(n):
@@ -345,65 +362,81 @@ class Solver:
                 self.lab.une_translation(opt,cote,num)
             
             dep = "rien"
-            for i in range(20):
+            for i in range(k):
                 """empêche le solver de tourner en rond en cas de cycle dans le labyrinthe"""
                 p = self.lab.avance(self.lab.joueurB)
-                if len(p)==1 :
+                if len(p)==0 :
                     """ si le seul déplacement que l'on peut faire est de rebrousser chemin"""
                     break
-                elif  dep in self.inv.keys(): 
-                    a = p.index(self.inv[dep])
-                    p[a:a+1]=[]
-                    a = random.randint(1,len(p))
-                    """ a une chance sur len(p) de s'arrêter avant"""
-                    if a==1:
+                else : 
+                    if (dep in self.inv.keys() )and (self.inv[dep] in p) :
+                        a = p.index(self.inv[dep])
+                        p[a:a+1]=[]
+                    e = random.randint(1,1+len(p))
+                    """ a une chance sur len(p)+1 de s'arrêter avant"""
+                    if e==1 or p==[]:    
                         break
-                    else:
-                        dep = random.choice(p)
-                        self.lab.deplacement(dep,self.lab.joueurB)
-
-            self.arbre.courant.val.setTotal(dist(self.lab.joueurB , self.lab.tresor))
-            self.arbre.courant.val.setVi(dist(self.lab.joueurB, self.lab.tresor))
+        
+                dep = random.choice(p)
+                self.lab.deplace(dep,self.lab.joueurB)
+                
+            
+            self.arbre.courant.val.setTotal(heuristique(self.lab.joueurB , self.lab.tresor))
+            self.arbre.courant.val.setVi(heuristique(self.lab.joueurB, self.lab.tresor))
 
     def mcts(self):
+        
         if type(self.arbre.courant) == type(Feuille(0)):
             
-            ni = self.arbre.courant.val.nbex
+            ni = self.arbre.courant.val.getNbex()
             if ni ==0:
+
                 self.arbre.courant.val.setNbex(ni +1)
                 ptr = self.arbre.getCurrent()
-                """la fonction backpropagation nous ramène à la racine. ptr pointe vers l'ancienne feuille courante"""
-                self.simulation()
-                """simulation d'une partie depuis la configuration courante"""
-                self.backPropagation()
-                """mise à jour des valeurs pour tous les noeuds courants"""
-                self.arbre.courant = ptr
-            choices = self.choix()
-            for c in range(len(choices)):
-                """ajouter chaque choix possible au fils et ajouter l'action nécessaire."""
-                self.arbre.addBranch([Feuille(c[i])])
-                self.arbre.courant.getFils(i).val.addaction(c[i])
+                
 
-            if len(self.arbre.courant.getAllFils)!=0:
+                lb = self.lab.copieLab()
+                self.simulation(10,10)
+                self.backPropagation()
+                self.lab=lb.copieLab()
+
+                self.arbre.courant = ptr
+                
+            choices = self.choix()
+            for i in range(len(choices)):
+                """ajouter chaque choix possible au fils et ajouter l'action nécessaire."""
+                sn = SNode()
+                self.arbre.addBranch([Feuille(sn)])
+                self.arbre.courant.val.addaction(choices[i])
+
+
+            
+            
+            if len(self.arbre.courant.getAllFils())!=0:
+                self.effectMov(self.arbre.courant.val.act[0])
                 self.arbre.gotoFils(0)
                 self.arbre.courant.val.setNbex(1)
-                self.simulation()
+                self.simulation(10,10)
         else :
+            
+            """ si ce n'est pas un noeud feuille continuer l'exploration"""
             t = self.arbre.courant.getAllFils()
             k=0
-            min =-100000000
+            max =-100000000
             """obtenir argmax(i, UCB1(fils(i))"""
             for i in range(len(t)):
                 self.arbre.gotoFils(i)
-                if min < self.UCB1():
+                cmp = int(self.UCB1())
+
+                if max <= cmp:
                     k=i
-                    min = self.UCB1
+                    max = cmp
                 self.arbre.gotoFather()
                 """effectuer l'action du fils k pour chaner la configuration du jeu"""
-                self.effectMov(self.courant.val.act[k])
+            self.effectMov(self.arbre.courant.val.act[k])
             self.arbre.gotoFils(k)
-            self.mtcs()
-                    
+            self.mcts()
+            
                 
 
                 
@@ -416,7 +449,9 @@ class Solver:
             self.lab = cplb.copieLab()
             self.arbre.courant = self.arbre.root
             self.mcts()
+            self.arbre.gotoRoot()
         """retourner l'action qui maximise vi"""
+        self.lab=cplb.copieLab()
         t = self.arbre.root.getAllFils()
         k=0
         max = -100000000
@@ -424,19 +459,22 @@ class Solver:
             if max < i.val.vi: 
                 max = i.val.vi
                 k=t.index(i)
+
         return self.arbre.root.val.act[k]
 
 
 
-
-
+"""
 if __name__=="__main__":
     
+
     lb = plat.Labyrinthe()
+    lb1 = lb.copieLab()
     solver = Solver(lb)
-    a = Arbreknaire()
-    solver.mcts()
+    lbd2 = solver.lab.copieLab()
+    t = solver.monteCarloTreeSearch(10)
 
+    print(t)
     
-    
-
+   
+"""
